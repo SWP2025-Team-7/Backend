@@ -12,3 +12,4 @@ def home_page():
 @app.post("/users/register")
 def register_user():
     logging.warning("User registration is not completed")
+
