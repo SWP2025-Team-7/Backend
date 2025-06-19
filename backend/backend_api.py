@@ -2,10 +2,9 @@ import os
 import base64
 from fastapi import FastAPI, status, HTTPException, Request
 from pydantic import BaseModel
+from backend.db.server import app
 import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-
-app = FastAPI()
 
 class UserRegistration(BaseModel):
     userId: int
