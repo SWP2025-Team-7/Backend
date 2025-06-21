@@ -3,6 +3,9 @@ import base64
 from fastapi import FastAPI, status, HTTPException, Request
 from pydantic import BaseModel
 from backend.db.server import app
+
+from backend.routes.students import router as students_router
+
 import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -13,6 +16,8 @@ class UserRegistration(BaseModel):
 class DocumentUploading(BaseModel):
     userId: int
     file_in_bytes: str
+
+app.include_router(students_router, prefix="/students")
 
 @app.get("/")
 def home_page():
