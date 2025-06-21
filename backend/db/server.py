@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
- 
+#from backend.routes.students import router as students_router
 from backend.db import config, tasks
  
 def get_application():
@@ -16,7 +16,9 @@ def get_application():
  
     app.add_event_handler("startup", tasks.create_start_app_handler(app))
     app.add_event_handler("shutdown", tasks.create_stop_app_handler(app))
- 
+    
+    #app.include_router(students_router, prefix="/students")
+
     return app
  
 app = get_application()

@@ -1,10 +1,15 @@
 import os
 import base64
-from fastapi import FastAPI, status, HTTPException, Request
+from fastapi import FastAPI, status, HTTPException, Request,Body,Depends
 from pydantic import BaseModel
 from backend.db.server import app
+from starlette.status import HTTP_201_CREATED
 
-from backend.routes.students import router as students_router
+from backend.models.bot_users import BotUsersCreate, BotUsersPublic
+from backend.db.repositories.bot_users import BotUsersRepository
+from backend.api.dependencies.database import get_repository
+from backend.db.server import app
+
 
 import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -17,8 +22,15 @@ class DocumentUploading(BaseModel):
     userId: int
     file_in_bytes: str
 
-app.include_router(students_router, prefix="/students")
+@app.post("/register")
+async def create_new_bot_user(
+    new_bot_user: BotUsersCreate = Body(..., embed=True),
+    bot_users_repo: BotUsersRepository = Depends(get_repository(BotUsersRepository)),
+) -> BotUsersPublic:
+    created_bot_user = await bot_users_repo.create_bot_user(new_bot_user=new_bot_user)
 
+    return created_bot_user
+"""
 @app.get("/")
 def home_page():
     return {"message": "Home Page"}
@@ -37,4 +49,4 @@ async def upload_document(r: DocumentUploading):
         f.write(r.file_in_bytes.encode("latin-1"))
     logging.warning("Uploading documents is not completed")
     
-
+"""
