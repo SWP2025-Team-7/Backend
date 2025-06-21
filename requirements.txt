@@ -1,5 +1,7 @@
-fastapi[all]
-requests
-python-dotenv
+fastapi
 SQLAlchemy
+databases
 uvicorn
+pydantic
+asyncpg
+alembic
