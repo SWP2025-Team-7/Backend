@@ -20,10 +20,10 @@ def create_bot_users_table() -> None:
     op.create_table(
         "bot_users",
         sa.Column("id", sa.Integer, primary_key=True),
-        sa.Column("email", sa.Text, nullable=False, index=True),
+        sa.Column("alias", sa.Text, nullable=False, index=True),
         sa.Column("login_date", sa.Date, nullable=False, index=True),
         sa.Column("login_time", sa.Time, nullable=False, index=True),
-        sa.Column(";ast_used_date", sa.Date, nullable=False, index=True),
+        sa.Column("last_used_date", sa.Date, nullable=False, index=True),
         sa.Column("last_used_time", sa.Time, nullable=False, index=True)
     )
  

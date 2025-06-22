@@ -16,4 +16,4 @@ USER appuser
 
 EXPOSE 8000
 
-ENTRYPOINT alembic upgrade head && uvicorn backend.backend_api:app --host 0.0.0.0 --port 8000
+ENTRYPOINT alembic upgrade head && uvicorn backend.backend_api:app --host 0.0.0.0 --port 8000  

@@ -3,7 +3,7 @@ from backend.models.bot_users import BotUsersCreate, BotUsersUpdate, BotUsersInD
 
 CREATE_BOT_USERS_QUERY = """
     INSERT INTO bot_users (alias, login_date, login_time, last_used_date, last_used_time)
-    VALUES (:alias, :login_date, :login_time, last_used_date, last_used_time)
+    VALUES (:alias, :login_date, :login_time, :last_used_date, :last_used_time)
     RETURNING id, alias, login_date, login_time, last_used_date, last_used_time
 """
 
