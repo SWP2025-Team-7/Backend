@@ -2,7 +2,7 @@ from typing import Optional
 from enum import Enum
 from datetime import date, time
  
-from models.core import IDModelMixin, CoreModel
+from backend.models.core import IDModel, CoreModel
  
  
 class Duty_To_Work(str, Enum):
@@ -85,11 +85,11 @@ class UsersUpdate(UsersBase):
     ndfl4_path: Optional[str]
  
  
-class UsersInDB(IDModelMixin, UsersBase):
+class UsersInDB(IDModel, UsersBase):
     pass
  
  
-class UsersPublic(IDModelMixin, UsersBase):
+class UsersPublic(IDModel, UsersBase):
     pass
  
  

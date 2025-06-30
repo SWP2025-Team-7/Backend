@@ -1,5 +1,5 @@
-from db.repositories.base import BaseRepository
-from models.users import UsersCreate, UsersUpdate, UsersInDB
+from backend.db.repositories.base import BaseRepository
+from backend.models.users import UsersCreate, UsersUpdate, UsersInDB
  
  
 CREATE_USERS_QUERY = """
