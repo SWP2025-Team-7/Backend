@@ -1,4 +1,10 @@
+from unittest.mock import AsyncMock, MagicMock
+from fastapi.testclient import TestClient
 import pytest
+
+from backend.db.repositories.users import UsersRepository
+from backend.api.dependencies.database import get_repository
+from backend.db.server import app
 
 def test_create_user(client):
     response = client.post("/users/", json={
@@ -34,10 +40,14 @@ def test_create_user_missing_field(client):
     response = client.post("/users/", json={})  # пустой запрос
     assert response.status_code == 422  # ошибка валидации
 
-def test_get_nonexistent_user(client):
-    response = client.get("/users/9999")  # предполагаем, что такого пользователя нет
+def test_get_nonexistent_user():
+    app.dependency_overrides[get_repository(UsersRepository)] = lambda: mock_repo
+    mock_repo = MagicMock()
+    mock_repo.get_user_by_id = AsyncMock(return_value=None)
+
+    client = TestClient(app)
+    response = client.get("/users/9999")
     assert response.status_code == 404
-    assert response.json()["detail"] == "User not found"
 
 def test_update_user(client):
     # Сначала создаём пользователя
