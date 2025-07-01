@@ -5,7 +5,7 @@ from backend.db.repositories.users import UsersRepository
 from backend.api.dependencies.database import get_repository
 
 
-router = APIRouter()
+router = APIRouter(prefix="/users")
 
 @router.post("/", response_model=UsersPublic, status_code=status.HTTP_201_CREATED)
 async def create_user(

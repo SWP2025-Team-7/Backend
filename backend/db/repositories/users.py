@@ -1,3 +1,4 @@
+from typing import Optional
 from backend.db.repositories.base import BaseRepository
 from backend.models.users import UsersCreate, UsersUpdate, UsersInDB
  
