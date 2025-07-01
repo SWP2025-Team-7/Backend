@@ -48,6 +48,9 @@ jobs:
 
     - name: Run tests
       env:
+        POSTGRES_USER: testuser
+        POSTGRES_PASSWORD: testpassword
+        POSTGRES_DB: testdb
         DATABASE_URL: postgresql+asyncpg://testuser:testpassword@localhost:5432/testdb
         PYTHONPATH: .
       run: |
