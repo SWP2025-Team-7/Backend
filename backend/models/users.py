@@ -47,7 +47,7 @@ class UsersBase(CoreModel):
     ndfl4_path: Optional[str]
  
  
-class UsersCreate(UsersBase):
+class UsersCreate(CoreModel):
     user_id: int
     alias: str
     mail: str
@@ -60,7 +60,8 @@ class UsersCreate(UsersBase):
     
  
  
-class UsersUpdate(UsersBase):
+class UsersUpdate(CoreModel):
+    user_id: int
     alias: Optional[str]
     mail: Optional[str]
     name: Optional[str]
@@ -91,5 +92,9 @@ class UsersInDB(IDModel, UsersBase):
  
 class UsersPublic(IDModel, UsersBase):
     pass
+
+class UsersDocumentUpload(CoreModel):
+    user_id: int
+    file_path: str
  
  

@@ -2,8 +2,8 @@ import pytest
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
 from unittest.mock import patch, AsyncMock, MagicMock
-from backend.routes.user import router as user_router
-from backend.routes.students import router as students_router
+from backend.routes.users import router as user_router
+from backend.routes.bot_users import router as students_router
 
 @pytest.fixture
 def client():
