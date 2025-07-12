@@ -5,9 +5,9 @@ from backend.models.bot_users import BotUsersCreate, BotUsersPublic
 from backend.db.repositories.bot_users import BotUsersRepository
 from backend.api.dependencies.database import get_repository
 
-router = APIRouter(prefix="/students")
+router = APIRouter(prefix="/bot_users")
 
-@router.post("/register", response_model=BotUsersPublic, name="students:register-student", status_code=HTTP_201_CREATED)
+@router.post("/register", response_model=BotUsersPublic, name="bot_users:register-bot_user", status_code=HTTP_201_CREATED)
 async def create_new_bot_user(
     new_bot_user: BotUsersCreate = Body(..., embed=True),
     bot_users_repo: BotUsersRepository = Depends(get_repository(BotUsersRepository)),
