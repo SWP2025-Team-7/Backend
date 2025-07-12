@@ -1,0 +1,45 @@
+networks:
+  bot:
+    external: true
+  backend:
+    external: false
+
+services:
+  db:
+    image: postgres
+    networks:
+      - backend
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - 5432:${POSTGRES_PORT}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - bot
+      - backend
+    expose:
+      - "8000"
+    ports:
+      - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    # command: alembic upgrade head && uvicorn backend.backend_api:app --host 0.0.0.0 --port 8000
+
+volumes:
+  postgres_data:
