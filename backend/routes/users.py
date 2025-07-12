@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from backend.models.users import UsersCreate, UsersUpdate, UsersInDB, UsersPublic, UsersDocumentUpload
+from backend.models.users import UsersCreate, UsersUpdate, UsersInDB, UsersPublic, UsersDocumentUpload, UsersDocumentUploadResponse
 from backend.db.repositories.users import UsersRepository
 from backend.api.dependencies.database import get_repository
 
@@ -8,6 +8,8 @@ import requests as re
 import json
 
 import os
+
+import logging
 
 router = APIRouter(prefix="/users")
 
@@ -54,8 +56,9 @@ async def delete_user(
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-@router.post("/{user_id}/documents/upload", status_code=status.HTTP_200_OK)
+@router.post("/{user_id}/documents/upload", response_model=UsersDocumentUploadResponse, status_code=status.HTTP_200_OK)
 async def upload_document(
+    user_id: int,
     user_document_upload: UsersDocumentUpload,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository))
 ):
@@ -64,12 +67,10 @@ async def upload_document(
     #     raise HTTPException(status_code=404, detail="User not found")
     
     # 
-    try:
-        data = {
-            "file_path": user_document_upload.file_path
-        }
-        re.post(url=f"{os.getenv('N8N_URL')}", json=data)
-    except Exception as e:
-        return 
-    # 
-    
+    data = {
+        "file_path": user_document_upload.file_path
+    }
+    ans = re.post(url=f"{os.getenv('N8N_URL')}", data=json.dumps(data), headers={'Content-Type': 'application/json'})
+    logging.info(f"{ans}")
+    return ans.json()
+

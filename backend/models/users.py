@@ -3,6 +3,8 @@ from enum import Enum
 from datetime import date, time
  
 from backend.models.core import IDModel, CoreModel
+
+from pydantic import BaseModel
  
  
 class Duty_To_Work(str, Enum):
@@ -93,8 +95,17 @@ class UsersInDB(IDModel, UsersBase):
 class UsersPublic(IDModel, UsersBase):
     pass
 
-class UsersDocumentUpload(CoreModel):
-    user_id: int
+class UsersDocumentUpload(BaseModel):
     file_path: str
  
- 
+class UsersDocumentUploadOutput(BaseModel):
+    fullName: str
+    position: str
+    salary: int
+    startDate: str
+    company: str
+    authenticity: str
+    authenticityConfidence: float
+
+class UsersDocumentUploadResponse(BaseModel):
+    output: Optional[UsersDocumentUploadOutput]
