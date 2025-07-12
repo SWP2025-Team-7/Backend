@@ -28,7 +28,7 @@ class UsersBase(CoreModel):
     name: Optional[str]
     surname: Optional[str]
     patronymic: Optional[str]
-    phone_number: Optional[int]
+    phone_number: Optional[str]
     citizens: Optional[str]
     duty_to_work: Optional[Duty_To_Work] = "yes"
     duty_status: Optional[Duty_Status] = "do_not_get_in_touch"
@@ -61,29 +61,28 @@ class UsersCreate(CoreModel):
  
  
 class UsersUpdate(CoreModel):
-    user_id: int
-    alias: Optional[str]
-    mail: Optional[str]
-    name: Optional[str]
-    surname: Optional[str]
-    patronymic: Optional[str]
-    phone_number: Optional[int]
-    citizens: Optional[str]
-    duty_to_work: Optional[Duty_To_Work] = "yes"
-    duty_status: Optional[Duty_Status] = "do_not_get_in_touch"
-    grant_amount: Optional[int]
-    duty_period: Optional[int]
-    company: Optional[str]
-    resume_path: Optional[str]
-    position: Optional[str]
-    start_date: Optional[date]
-    end_date: Optional[date]
-    salary: Optional[int]
-    working_reference_path: Optional[str]
-    ndfl1_path: Optional[str]
-    ndfl2_path: Optional[str]
-    ndfl3_path: Optional[str]
-    ndfl4_path: Optional[str]
+    alias: Optional[str] = None
+    mail: Optional[str] = None
+    name: Optional[str] = None
+    surname: Optional[str] = None
+    patronymic: Optional[str] = None
+    phone_number: Optional[str] = None
+    citizens: Optional[str] = None
+    duty_to_work: Optional[Duty_To_Work] = None
+    duty_status: Optional[Duty_Status] = None
+    grant_amount: Optional[int] = None
+    duty_period: Optional[int] = None
+    company: Optional[str] = None
+    resume_path: Optional[str] = None
+    position: Optional[str] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    salary: Optional[int] = None
+    working_reference_path: Optional[str] = None
+    ndfl1_path: Optional[str] = None
+    ndfl2_path: Optional[str] = None
+    ndfl3_path: Optional[str] = None
+    ndfl4_path: Optional[str] = None
  
  
 class UsersInDB(IDModel, UsersBase):

@@ -37,9 +37,9 @@ class UsersRepository(BaseRepository):
         return None
     
     async def update_user(self, *, user_id: int, user_update: UsersUpdate) -> Optional[UsersInDB]:
-        update_data = user_update.dict(exclude_unset=True)  # берём только поля, которые обновляем
-        if not update_data:
-            return None  # нечего обновлять
+        update_data = user_update.dict(exclude_unset=True)  # берём только поля, которые обновляем, те что равны None удаляются
+        #if not update_data:
+        #    return None  # нечего обновлять
 
         set_clause = ", ".join([f"{field} = :{field}" for field in update_data.keys()])
         query = f"""

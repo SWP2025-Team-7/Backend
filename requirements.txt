@@ -5,10 +5,7 @@ uvicorn
 pydantic
 asyncpg
 alembic
-<<<<<<< HEAD
 pdf2image
 Pillow
 httpx
-=======
 requests
->>>>>>> origin/dev

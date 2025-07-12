@@ -4,13 +4,8 @@ from fastapi import FastAPI, status, HTTPException, Request,Body,Depends
 from pydantic import BaseModel
 from backend.db.server import app
 from starlette.status import HTTP_201_CREATED
-<<<<<<< HEAD
-from backend.routes.students import router as students_router
-from backend.routes.documents import router as documents_router
-=======
 from backend.routes.bot_users import router as bot_router
 from backend.routes.users import router as user_router
->>>>>>> origin/dev
 
 from backend.models.bot_users import BotUsersCreate, BotUsersPublic
 from backend.db.repositories.bot_users import BotUsersRepository
@@ -33,10 +28,5 @@ class DocumentUploading(BaseModel):
 def home_page():
     return {"message": "Home Page"}
     
-<<<<<<< HEAD
-app.include_router(router=students_router)
-app.include_router(router=documents_router)
-=======
 app.include_router(router=bot_router)
 app.include_router(router=user_router)
->>>>>>> origin/dev

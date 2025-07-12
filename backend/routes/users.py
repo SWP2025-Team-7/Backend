@@ -41,6 +41,9 @@ async def update_user(
     if not existing_user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    update_data = user_update.dict(exclude_unset=True) # Мб не стоит ттак писать, мб можно это внести в repo.update_user
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No data to update")
     updated_user = await users_repo.update_user(user_id=user_id, user_update=user_update)
     return updated_user
 
