@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Body, Depends
+from fastapi import APIRouter, Body, Depends
 from starlette.status import HTTP_201_CREATED
 
 from backend.models.bot_users import BotUsersCreate, BotUsersPublic
