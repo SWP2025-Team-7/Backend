@@ -1,1 +1,1 @@
-from .core import IDModel, CoreModel
+from .core import CoreModel

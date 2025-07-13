@@ -2,7 +2,7 @@ from typing import Optional
 from enum import Enum
 from datetime import date, time
  
-from backend.models.core import IDModel, CoreModel
+from backend.models.core import CoreModel
 
 from pydantic import BaseModel
  
@@ -26,73 +26,49 @@ class Duty_Status(str, Enum):
 class UsersBase(CoreModel):
     user_id: Optional[int]
     alias: Optional[str]
-    mail: Optional[str]
-    name: Optional[str]
-    surname: Optional[str]
-    patronymic: Optional[str]
-    phone_number: Optional[int]
-    citizens: Optional[str]
-    duty_to_work: Optional[Duty_To_Work] = "yes"
-    duty_status: Optional[Duty_Status] = "do_not_get_in_touch"
-    grant_amount: Optional[int]
-    duty_period: Optional[int]
-    company: Optional[str]
-    resume_path: Optional[str]
-    position: Optional[str]
-    start_date: Optional[date]
-    end_date: Optional[date]
-    salary: Optional[int]
-    working_reference_path: Optional[str]
-    ndfl1_path: Optional[str]
-    ndfl2_path: Optional[str]
-    ndfl3_path: Optional[str]
-    ndfl4_path: Optional[str]
- 
- 
+    mail: Optional[str] = None
+    name: Optional[str] = None
+    surname: Optional[str] = None
+    patronymic: Optional[str] = None
+    phone_number: Optional[int] = None
+    citizens: Optional[str] = None
+    duty_to_work: Optional[Duty_To_Work] = None
+    duty_status: Optional[Duty_Status] = None
+    grant_amount: Optional[int] = None
+    duty_period: Optional[int] = None
+    company: Optional[str] = None
+    position: Optional[str] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    salary: Optional[int] = None
+
 class UsersCreate(CoreModel):
     user_id: int
     alias: str
-    mail: str
-    name: str
-    surname: str
-    patronymic: str
-    # phone_number: str
-    # citizens: str
-    # duty_to_work: Duty_To_Work
+
+# class UsersCreate(CoreModel):
+#     user_id: int
+#     alias: str
+#     mail: str
+#     name: str
+#     surname: str
+#     patronymic: str
+#     # phone_number: str
+#     # citizens: str
+#     # duty_to_work: Duty_To_Work
     
  
  
-class UsersUpdate(CoreModel):
-    user_id: int
-    alias: Optional[str]
-    mail: Optional[str]
-    name: Optional[str]
-    surname: Optional[str]
-    patronymic: Optional[str]
-    phone_number: Optional[int]
-    citizens: Optional[str]
-    duty_to_work: Optional[Duty_To_Work] = "yes"
-    duty_status: Optional[Duty_Status] = "do_not_get_in_touch"
-    grant_amount: Optional[int]
-    duty_period: Optional[int]
-    company: Optional[str]
-    resume_path: Optional[str]
-    position: Optional[str]
-    start_date: Optional[date]
-    end_date: Optional[date]
-    salary: Optional[int]
-    working_reference_path: Optional[str]
-    ndfl1_path: Optional[str]
-    ndfl2_path: Optional[str]
-    ndfl3_path: Optional[str]
-    ndfl4_path: Optional[str]
+class UsersUpdate(UsersBase):
+    user_id: int = None
+    alias: Optional[str] = None
  
  
-class UsersInDB(IDModel, UsersBase):
+class UsersInDB(UsersBase):
     pass
  
  
-class UsersPublic(IDModel, UsersBase):
+class UsersPublic(UsersBase):
     pass
 
 class UsersDocumentUpload(BaseModel):
