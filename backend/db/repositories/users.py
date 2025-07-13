@@ -1,7 +1,7 @@
 from typing import Optional
 from backend.db.repositories.base import BaseRepository
 from backend.models.users import UsersCreate, UsersUpdate, UsersInDB
-import json
+import logging  
  
  
 # CREATE_USERS_QUERY = """
@@ -25,12 +25,13 @@ GET_USER_BY_USER_ID_QUERY = """
 """
 
 DELETE_USER_BY_USER_ID_QUERY = """
-    DELETE FROM users WHERE user_id = :user_id RETURNING id;
+    DELETE FROM users WHERE user_id = :user_id RETURNING user_id;
 """
 
 class UsersRepository(BaseRepository):
     
     async def create_user(self, *, new_user: UsersCreate) -> UsersInDB:
+        logging.info(f"Creating user: {new_user.user_id}")
         query_values = new_user.model_dump()
         user = await self.db.fetch_one(query=CREATE_USERS_QUERY, values=query_values)
         return UsersInDB(**user)
@@ -42,6 +43,7 @@ class UsersRepository(BaseRepository):
         return None
     
     async def update_user(self, *, user_id: int, user_update: UsersUpdate) -> Optional[UsersInDB]:
+        logging.info(f"Updating user: {user_update.user_id}; Fields: {user_update.model_dump(exclude_unset=True)}")
         update_data = user_update.model_dump(exclude_unset=True)
         if not update_data:
             return None
@@ -57,5 +59,5 @@ class UsersRepository(BaseRepository):
         return None
 
     async def delete_user(self, *, user_id: int) -> bool:
-        deleted = await self.db.execute(query=DELETE_USER_BY_USER_ID_QUERY, values={"user_id": user_id})
-        return deleted > 0
+        logging.info(f"Deleting user: {user_id}")
+        await self.db.execute(query=DELETE_USER_BY_USER_ID_QUERY, values={"user_id": user_id})

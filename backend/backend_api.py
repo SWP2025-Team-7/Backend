@@ -11,7 +11,7 @@ from backend.db.server import app
 
 
 import logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(asctime)s %(message)s")
 
 class UserRegistration(BaseModel):
     userId: int
