@@ -4,7 +4,7 @@ from datetime import date, time
  
 from backend.models.core import CoreModel
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
  
  
 class Duty_To_Work(str, Enum):
@@ -30,7 +30,7 @@ class UsersBase(CoreModel):
     name: Optional[str] = None
     surname: Optional[str] = None
     patronymic: Optional[str] = None
-    phone_number: Optional[int] = None
+    phone_number: Optional[str] = None
     citizens: Optional[str] = None
     duty_to_work: Optional[Duty_To_Work] = None
     duty_status: Optional[Duty_Status] = None
@@ -65,6 +65,9 @@ class UsersUpdate(UsersBase):
  
  
 class UsersInDB(UsersBase):
+    @field_serializer("start_date", "end_date")
+    def serialize_dates(self, value: date | None) -> str | None:
+        return value.isoformat() if value else None
     pass
  
  

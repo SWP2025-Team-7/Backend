@@ -43,7 +43,7 @@ class UsersRepository(BaseRepository):
         return None
     
     async def update_user(self, *, user_id: int, user_update: UsersUpdate) -> Optional[UsersInDB]:
-        logging.info(f"Updating user: {user_update.user_id}; Fields: {user_update.model_dump(exclude_unset=True)}")
+        logging.info(f"Updating user: {user_id}; Fields: {user_update.model_dump(exclude_unset=True)}")
         update_data = user_update.model_dump(exclude_unset=True)
         if not update_data:
             return None

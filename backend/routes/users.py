@@ -6,9 +6,10 @@ from backend.db.repositories.users import UsersRepository
 from backend.api.dependencies.database import get_repository
 
 import requests as re
-import json
 
 import os
+
+import json
 
 import logging
 
@@ -47,6 +48,11 @@ async def get_user_by_id(
     user = await users_repo.get_user_by_id(user_id=user_id)
     if not user:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
+    logging.info(user.start_date)
+    logging.info(type(user.start_date))
+    logging.info(user.start_date.isoformat())
+    logging.info(type(user.start_date.isoformat()))
+    logging.info(user.model_dump())
     return JSONResponse(status_code=status.HTTP_200_OK, content=user.model_dump())
 
 
@@ -68,7 +74,7 @@ async def update_user(
     return JSONResponse(status_code=status.HTTP_200_OK, content=updated_user.model_dump())
 
 
-@router.delete("/{user_id}", 
+@router.delete("/{user_id}", name="users:delete-user",
                responses={
                    status.HTTP_404_NOT_FOUND: {"description": "User not found"},
                    status.HTTP_200_OK: {"description": "User deleted"}
@@ -83,21 +89,21 @@ async def delete_user(
     await users_repo.delete_user(user_id=user_id)
     return JSONResponse(status_code=status.HTTP_200_OK, content={"detail": "User deleted"})
 
-# @router.post("/{user_id}/documents/upload", response_model=UsersDocumentUploadResponse, status_code=status.HTTP_200_OK)
-# async def upload_document(
-#     user_id: int,
-#     user_document_upload: UsersDocumentUpload,
-#     users_repo: UsersRepository = Depends(get_repository(UsersRepository))
-# ):
-#     # existing_user = await users_repo.get_user_by_id(user_document_upload.user_id)
-#     # if not existing_user:
-#     #     raise HTTPException(status_code=404, detail="User not found")
+@router.post("/{user_id}/documents/upload", response_model=UsersDocumentUploadResponse, status_code=status.HTTP_200_OK)
+async def upload_document(
+    user_id: int,
+    user_document_upload: UsersDocumentUpload,
+    users_repo: UsersRepository = Depends(get_repository(UsersRepository))
+):
+    # existing_user = await users_repo.get_user_by_id(user_document_upload.user_id)
+    # if not existing_user:
+    #     raise HTTPException(status_code=404, detail="User not found")
     
-#     # 
-#     data = {
-#         "file_path": user_document_upload.file_path
-#     }
-#     ans = re.post(url=f"{os.getenv('N8N_URL')}", data=json.dumps(data), headers={'Content-Type': 'application/json'})
-#     logging.info(f"{ans}")
-#     return ans.json()
+    # 
+    data = {
+        "file_path": user_document_upload.file_path
+    }
+    ans = re.post(url=f"{os.getenv('N8N_URL')}", data=json.dumps(data), headers={'Content-Type': 'application/json'})
+    logging.info(f"{ans}")
+    return ans.json()
 
