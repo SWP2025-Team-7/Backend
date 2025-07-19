@@ -3,6 +3,8 @@ networks:
     external: true
   backend:
     external: false
+  web:
+    external: true
 
 services:
   db:
@@ -30,6 +32,7 @@ services:
     networks:
       - bot
       - backend
+      - web
     expose:
       - "8000"
     ports:

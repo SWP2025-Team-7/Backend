@@ -39,11 +39,24 @@ def create_users_table() -> None:
 
 # sa.Column("cleaning_type", sa.Text, nullable=False, server_default="spot_clean"),
 
+def create_files_table()->None:
+    op.create_table(
+        "files",
+        sa.Column("file_id", sa.Integer, primary_key=True, autoincrement=True),
+        sa.Column("file_name", sa.Text, nullable=False),
+        sa.Column("file_path", sa.Text, nullable=False),
+        sa.Column("file_type", sa.Text, nullable=False),
+        sa.Column("user_id", sa.Integer, sa.ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False),
+        sa.Column("created_at", sa.DateTime, nullable=False),
+    )
+
 def upgrade() -> None:
     create_users_table()
+    create_files_table()
  
  
 def downgrade() -> None:
     op.drop_table("users")
+    op.drop_table("files")
  
  

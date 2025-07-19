@@ -41,7 +41,9 @@ async def get_users(
 ):
     return JSONResponse(status_code=status.HTTP_200_OK, content=[user.model_dump() for user in await users_repo.get_all_users()])
 
-@router.get("/{user_id}", response_model=UsersPublic, name="users:get-user",
+user_router = APIRouter(prefix="/{user_id}")
+
+@user_router.get("/", response_model=UsersPublic, name="users:get-user",
             responses={
                 status.HTTP_404_NOT_FOUND: {"description": "User not found"},
                 status.HTTP_200_OK: {"model": UsersPublic, "description": "User found"}
@@ -61,7 +63,7 @@ async def get_user_by_id(
     return JSONResponse(status_code=status.HTTP_200_OK, content=user.model_dump())
 
 
-@router.patch("/{user_id}", response_model=UsersPublic, name="users:update-user",
+@user_router.patch("/", response_model=UsersPublic, name="users:update-user",
               responses={
                   status.HTTP_404_NOT_FOUND: {"description": "User not found"},
                   status.HTTP_200_OK: {"model": UsersPublic, "description": "User updated"}
@@ -79,7 +81,7 @@ async def update_user(
     return JSONResponse(status_code=status.HTTP_200_OK, content=updated_user.model_dump())
 
 
-@router.delete("/{user_id}", name="users:delete-user",
+@user_router.delete("/", name="users:delete-user",
                responses={
                    status.HTTP_404_NOT_FOUND: {"description": "User not found"},
                    status.HTTP_200_OK: {"description": "User deleted"}
@@ -94,7 +96,9 @@ async def delete_user(
     await users_repo.delete_user(user_id=user_id)
     return JSONResponse(status_code=status.HTTP_200_OK, content={"detail": "User deleted"})
 
-@router.post("/{user_id}/documents/upload", response_model=UsersDocumentUploadResponse, status_code=status.HTTP_200_OK)
+files_router = APIRouter(prefix="/documents")
+
+@files_router.post("/extract", response_model=UsersDocumentUploadResponse, status_code=status.HTTP_200_OK)
 async def upload_document(
     user_id: int,
     user_document_upload: UsersDocumentUpload,
@@ -112,3 +116,19 @@ async def upload_document(
     logging.info(f"{ans}")
     return ans.json()
 
+@files_router.get("/", response_model=UsersPublic, name="users:get-user",
+            responses={
+                status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+                status.HTTP_200_OK: {"model": UsersPublic, "description": "User found"}
+                })
+async def get_user_by_id(
+    user_id: int,
+    users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
+):
+    user = await users_repo.get_user_by_id(user_id=user_id)
+    if not user:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
+    files = await users_repo.get_files_by_user_id(user_id=user_id)
+
+user_router.include_router(files_router)
+router.include_router(user_router)
