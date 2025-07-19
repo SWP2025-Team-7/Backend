@@ -42,7 +42,7 @@ class UsersBase(CoreModel):
     end_date: Optional[date] = None
     salary: Optional[int] = None
 
-class UsersCreate(CoreModel):
+class UsersCreate(UsersBase):
     user_id: int
     alias: str
 
