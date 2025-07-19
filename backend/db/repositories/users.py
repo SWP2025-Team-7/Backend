@@ -24,6 +24,10 @@ GET_USER_BY_USER_ID_QUERY = """
     SELECT * FROM users WHERE user_id = :user_id;
 """
 
+GET_ALL_USERS_QUERY = """
+    SELECT * FROM users;
+"""
+
 DELETE_USER_BY_USER_ID_QUERY = """
     DELETE FROM users WHERE user_id = :user_id RETURNING user_id;
 """
@@ -41,6 +45,10 @@ class UsersRepository(BaseRepository):
         if user:
             return UsersInDB(**user)
         return None
+    
+    async def get_all_users(self):
+        users = await self.db.fetch_all(query=GET_ALL_USERS_QUERY)
+        return [UsersInDB(**user) for user in users]
     
     async def update_user(self, *, user_id: int, user_update: UsersUpdate) -> Optional[UsersInDB]:
         logging.info(f"Updating user: {user_id}; Fields: {user_update.model_dump(exclude_unset=True)}")
