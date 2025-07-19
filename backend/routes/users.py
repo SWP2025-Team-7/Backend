@@ -35,6 +35,11 @@ async def create_user(
     created_user = await users_repo.create_user(new_user=new_user)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user.model_dump())
 
+@router.get("/", response_model=list[UsersPublic], name="users:get-users")
+async def get_users(
+    users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
+):
+    return JSONResponse(status_code=status.HTTP_200_OK, content=[user.model_dump() for user in await users_repo.get_all_users()])
 
 @router.get("/{user_id}", response_model=UsersPublic, name="users:get-user",
             responses={
