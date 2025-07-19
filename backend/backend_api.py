@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from backend.db.server import app
 from starlette.status import HTTP_201_CREATED
 from backend.routes.users import router as users_router
+from backend.routes.authorization import router as authorization_router
 
 from backend.api.dependencies.database import get_repository
 from backend.db.server import app
@@ -26,3 +27,4 @@ def home_page():
     return {"message": "Home Page"}
     
 app.include_router(router=users_router)
+app.include_router(router=authorization_router)

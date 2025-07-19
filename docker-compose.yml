@@ -5,12 +5,16 @@ networks:
     external: false
   web:
     external: true
+  n8n:
+    external: true
 
 services:
   db:
+    container_name: db
     image: postgres
     networks:
       - backend
+      - n8n
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
