@@ -7,7 +7,7 @@ networks:
     external: true
   n8n:
     external: true
-
+ 
 services:
   db:
     container_name: db

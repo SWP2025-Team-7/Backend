@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from backend.db.server import app
 from starlette.status import HTTP_201_CREATED
 from backend.routes.users import router as users_router
-from backend.routes.authorization import router as authorization_router
+from backend.routes.auth import router as authorization_router
 
 from backend.api.dependencies.database import get_repository
 from backend.db.server import app
