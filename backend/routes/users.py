@@ -1,5 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
+from fastapi import UploadFile, File
+from utils.parse_excel import parse_users_excel
+from backend.models.users import UsersCreate, UsersUpdate
+import shutil
+import os
 
 from backend.models.users import UsersCreate, UsersUpdate, UsersInDB, UsersPublic, UsersDocumentUpload, UsersDocumentUploadResponse
 from backend.db.repositories.users import UsersRepository
@@ -106,4 +111,43 @@ async def upload_document(
     ans = re.post(url=f"{os.getenv('N8N_URL')}", data=json.dumps(data), headers={'Content-Type': 'application/json'})
     logging.info(f"{ans}")
     return ans.json()
+@router.post("/upload_excel", name="users:upload-users-from-excel")
+async def upload_users_from_excel(
+    file: UploadFile = File(...),
+    users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
+):
+    temp_path = f"temp_{file.filename}"
+    with open(temp_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    inserted = 0
+    updated = 0
+
+    try:
+        rows = parse_users_excel(temp_path)
+
+        for row in rows:
+            alias = row["alias"]
+            existing_user = await users_repo.get_user_by_alias(alias=alias)
+
+            if existing_user:
+                user_update = UsersUpdate(**row)
+                await users_repo.update_user(user_id=existing_user.user_id, user_update=user_update)
+                updated += 1
+            else:
+                user_create = UsersCreate(**row)
+                await users_repo.create_user(new_user=user_create)
+                inserted += 1
+
+        return {
+            "status": "success",
+            "inserted": inserted,
+            "updated": updated
+        }
+
+    except Exception as e:
+        return {"status": "error", "details": str(e)}
+
+    finally:
+        os.remove(temp_path)
 
