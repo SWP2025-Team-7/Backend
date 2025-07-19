@@ -20,6 +20,17 @@ REGISTER_USER_QUERY = """
     INSERT INTO users ()
 """
 
+GET_USER_BY_ALIAS_QUERY = """
+    SELECT * FROM users WHERE alias = :alias;
+"""
+
+async def get_user_by_alias(self, *, alias: str) -> Optional[UsersInDB]:
+    user = await self.db.fetch_one(query=GET_USER_BY_ALIAS_QUERY, values={"alias": alias})
+    if user:
+        return UsersInDB(**user)
+    return None
+
+
 GET_USER_BY_USER_ID_QUERY = """
     SELECT * FROM users WHERE user_id = :user_id;
 """
