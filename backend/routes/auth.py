@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from backend.models.authorization import LoginResponse, Login
+from backend.models.auth import LoginResponse
 
 router = APIRouter(prefix="/login")
 
