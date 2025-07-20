@@ -142,7 +142,54 @@ async def upload_document(
     created_file = await files_repo.create_file(new_file=file)
     return JSONResponse(status_code=status.HTTP_200_OK, content=created_file.model_dump())
 
+@files_router.get("/", response_model=list[FilesPublic], name="documents:get-files",
+            responses={
+                status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+                status.HTTP_200_OK: {"model": list[FilesPublic], "description": "Files found"}
+                })
+async def get_files_by_user_id(
+    user_id: int,
+    users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
+    files_repo: FilesRepository = Depends(get_repository(FilesRepository))
+):
+    existing_user = await users_repo.get_user_by_id(user_id=user_id)
+    if not existing_user:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
+    
+    files = await files_repo.get_files_by_user_id(user_id=user_id)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=[file.model_dump() for file in files])
 
+@files_router.get("/{file_id}", response_model=FilesPublic, name="documents:get-file",
+            responses={
+                status.HTTP_404_NOT_FOUND: {"description": "File not found"},
+                status.HTTP_200_OK: {"model": FilesPublic, "description": "File found"}
+                })
+async def get_file_by_id(
+    file_id: int,
+    files_repo: FilesRepository = Depends(get_repository(FilesRepository))
+):
+    existing_file = await files_repo.get_file_by_id(id=file_id)
+    if not existing_file:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "File not found"})
+    
+    return JSONResponse(status_code=status.HTTP_200_OK, content=existing_file.model_dump()
+)
+
+@files_router.delete("/", name="documents:delete-file",
+               responses={
+                   status.HTTP_404_NOT_FOUND: {"description": "File not found"},
+                   status.HTTP_200_OK: {"description": "File deleted"}
+               })
+async def delete_file(
+    file_id: int,
+    files_repo: FilesRepository = Depends(get_repository(FilesRepository))
+):
+    existing_file = await files_repo.get_file_by_id(id=file_id)
+    if not existing_file:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
+    
+    await files_repo.delete_file(id=file_id)
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"detail": "File deleted"})
 
 user_router.include_router(files_router)
 router.include_router(user_router)
