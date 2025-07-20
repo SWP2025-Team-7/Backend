@@ -6,13 +6,28 @@ from backend.models.core import CoreModel
 
 from pydantic import BaseModel, field_serializer
 
+class FilesExtract(BaseModel):
+    file_path: str
+ 
+class FilesExtractOutput(BaseModel):
+    fullName: str
+    position: str
+    salary: int
+    startDate: str
+    company: str
+    authenticity: str
+    authenticityConfidence: float
+
+class FilesExtractResponse(BaseModel):
+    output: Optional[FilesExtractOutput]
+
 class File_Type(str, Enum):
     two_ndfl = "2-ndfl"
     working_reference = "working-reference"
     resume = "resume"
     
 class FilesBase(CoreModel):
-    file_id: Optional[int]
+    id: Optional[int]
     file_name: Optional[str]
     file_path: Optional[str]
     file_type: Optional[File_Type]

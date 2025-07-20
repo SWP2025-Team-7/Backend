@@ -6,3 +6,4 @@ pydantic
 asyncpg
 alembic
 requests
+python-multipart

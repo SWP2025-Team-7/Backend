@@ -74,17 +74,3 @@ class UsersInDB(UsersBase):
 class UsersPublic(UsersBase):
     pass
 
-class UsersDocumentUpload(BaseModel):
-    file_path: str
- 
-class UsersDocumentUploadOutput(BaseModel):
-    fullName: str
-    position: str
-    salary: int
-    startDate: str
-    company: str
-    authenticity: str
-    authenticityConfidence: float
-
-class UsersDocumentUploadResponse(BaseModel):
-    output: Optional[UsersDocumentUploadOutput]

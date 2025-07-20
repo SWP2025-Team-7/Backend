@@ -4,9 +4,9 @@ from backend.models.files import FilesCreate, FilesInDB
 import logging  
 
 CREATE_FILE_QUERY = """
-    INSERT INTO files (file_id, file_name, file_path, file_type, user_id, created_at)
-    VALUES (:file_id, :file_name, :file_path, :file_type, :user_id, :created_at)
-    RETURNING file_id, file_name, file_path, file_type, user_id, created_at;
+    INSERT INTO files (file_name, file_path, file_type, user_id, created_at)
+    VALUES (:file_name, :file_path, :file_type, :user_id, :created_at)
+    RETURNING id, file_name, file_path, file_type, user_id, created_at;
 """
 
 GET_FILE_BY_USER_ID_QUERY = """

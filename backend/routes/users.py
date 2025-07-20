@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
 from fastapi.responses import JSONResponse
 
-from backend.models.users import UsersCreate, UsersUpdate, UsersInDB, UsersPublic, UsersDocumentUpload, UsersDocumentUploadResponse
+from backend.models.users import UsersCreate, UsersUpdate, UsersInDB, UsersPublic
 from backend.db.repositories.users import UsersRepository
+
+from backend.models.files import FilesCreate, FilesInDB, FilesPublic, FilesExtract, FilesExtractOutput, FilesExtractResponse, File_Type
+from backend.db.repositories.files import FilesRepository
+
 from backend.api.dependencies.database import get_repository
 
+from datetime import datetime, date
 import requests as re
 
 import os
@@ -48,20 +53,14 @@ user_router = APIRouter(prefix="/{user_id}")
                 status.HTTP_404_NOT_FOUND: {"description": "User not found"},
                 status.HTTP_200_OK: {"model": UsersPublic, "description": "User found"}
                 })
-async def get_user_by_id(
+async def get_user_by_id( 
     user_id: int,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
 ):
     user = await users_repo.get_user_by_id(user_id=user_id)
     if not user:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
-    logging.info(user.start_date)
-    logging.info(type(user.start_date))
-    logging.info(user.start_date.isoformat())
-    logging.info(type(user.start_date.isoformat()))
-    logging.info(user.model_dump())
     return JSONResponse(status_code=status.HTTP_200_OK, content=user.model_dump())
-
 
 @user_router.patch("/", response_model=UsersPublic, name="users:update-user",
               responses={
@@ -80,7 +79,6 @@ async def update_user(
     updated_user = await users_repo.update_user(user_id=user_id, user_update=user_update)
     return JSONResponse(status_code=status.HTTP_200_OK, content=updated_user.model_dump())
 
-
 @user_router.delete("/", name="users:delete-user",
                responses={
                    status.HTTP_404_NOT_FOUND: {"description": "User not found"},
@@ -98,10 +96,11 @@ async def delete_user(
 
 files_router = APIRouter(prefix="/documents")
 
-@files_router.post("/extract", response_model=UsersDocumentUploadResponse, status_code=status.HTTP_200_OK)
+@files_router.post("/extract", response_model=FilesExtractResponse, name="documents:extract-file",
+                   status_code=status.HTTP_200_OK)
 async def upload_document(
     user_id: int,
-    user_document_upload: UsersDocumentUpload,
+    user_document_upload: FilesExtract,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository))
 ):
     # existing_user = await users_repo.get_user_by_id(user_document_upload.user_id)
@@ -116,19 +115,34 @@ async def upload_document(
     logging.info(f"{ans}")
     return ans.json()
 
-@files_router.get("/", response_model=UsersPublic, name="users:get-user",
+@files_router.post("/", response_model=UsersPublic, name="documents:upload-file",
             responses={
                 status.HTTP_404_NOT_FOUND: {"description": "User not found"},
-                status.HTTP_200_OK: {"model": UsersPublic, "description": "User found"}
+                status.HTTP_200_OK: {"model": UsersPublic, "description": "File uploaded"}
                 })
-async def get_user_by_id(
+async def upload_document(
     user_id: int,
+    uploaded_file: UploadFile,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
+    files_repo: FilesRepository = Depends(get_repository(FilesRepository))
 ):
-    user = await users_repo.get_user_by_id(user_id=user_id)
-    if not user:
+    existing_user = await users_repo.get_user_by_id(user_id=user_id)
+    if not existing_user:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
-    files = await users_repo.get_files_by_user_id(user_id=user_id)
+    
+    
+    
+    file = FilesCreate(
+        file_name=uploaded_file.filename,
+        file_path="path",
+        file_type=File_Type.working_reference.value,
+        user_id=user_id,
+        created_at=datetime.now().date()
+    )
+    created_file = await files_repo.create_file(new_file=file)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=created_file.model_dump())
+
+
 
 user_router.include_router(files_router)
 router.include_router(user_router)

@@ -42,7 +42,7 @@ def create_users_table() -> None:
 def create_files_table()->None:
     op.create_table(
         "files",
-        sa.Column("file_id", sa.Integer, primary_key=True, autoincrement=True),
+        sa.Column("id", sa.Integer, primary_key=True),
         sa.Column("file_name", sa.Text, nullable=False),
         sa.Column("file_path", sa.Text, nullable=False),
         sa.Column("file_type", sa.Text, nullable=False),
