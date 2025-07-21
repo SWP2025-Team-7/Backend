@@ -6,5 +6,10 @@ from backend.models.core import CoreModel
 
 from pydantic import BaseModel, field_serializer
 
-class LoginResponse(BaseModel):
-    token: str
+class Login(BaseModel):
+    username: str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

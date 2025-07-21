@@ -9,6 +9,8 @@ from backend.db.repositories.files import FilesRepository
 
 from backend.api.dependencies.database import get_repository
 
+from backend.routes.auth import user_dependency
+
 from datetime import datetime, date
 import requests as re
 
@@ -18,18 +20,25 @@ import json
 
 import logging
 
-router = APIRouter(prefix="/users")
+router = APIRouter()
 
-@router.post("/", response_model=UsersPublic, name="users:create-user", 
+users_router = APIRouter(prefix="/users", tags=["Users"])
+user_router = APIRouter(prefix="/users/{user_id}", tags=["User"])
+files_router = APIRouter(prefix="/users/{user_id}/documents", tags=["Documents"])
+
+@users_router.post("/", response_model=UsersPublic, name="users:create-user", 
              responses={
                  status.HTTP_400_BAD_REQUEST: {"model": UsersPublic, "description": "User already exists", },
                  status.HTTP_201_CREATED: {"model": UsersPublic, "description": "User created"},
                  status.HTTP_200_OK: {"model": UsersPublic, "description": "User updated"}
                  })
 async def create_user(
+    auth_user: user_dependency,
     new_user: UsersCreate,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
 ) -> UsersCreate:
+    if not auth_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     user = await users_repo.get_user_by_id(user_id=new_user.user_id)
     if user:
         if user.alias == new_user.alias:
@@ -40,13 +49,15 @@ async def create_user(
     created_user = await users_repo.create_user(new_user=new_user)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user.model_dump())
 
-@router.get("/", response_model=list[UsersPublic], name="users:get-users")
+@users_router.get("/", response_model=list[UsersPublic], name="users:get-users")
 async def get_users(
+    auth_user: user_dependency,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
 ):
+    if not auth_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     return JSONResponse(status_code=status.HTTP_200_OK, content=[user.model_dump() for user in await users_repo.get_all_users()])
 
-user_router = APIRouter(prefix="/{user_id}")
 
 @user_router.get("/", response_model=UsersPublic, name="users:get-user",
             responses={
@@ -54,9 +65,12 @@ user_router = APIRouter(prefix="/{user_id}")
                 status.HTTP_200_OK: {"model": UsersPublic, "description": "User found"}
                 })
 async def get_user_by_id( 
+    auth_user: user_dependency,
     user_id: int,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
 ):
+    if not auth_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     user = await users_repo.get_user_by_id(user_id=user_id)
     if not user:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
@@ -68,10 +82,13 @@ async def get_user_by_id(
                   status.HTTP_200_OK: {"model": UsersPublic, "description": "User updated"}
                   })
 async def update_user(
+    auth_user: user_dependency,
     user_id: int,
     user_update: UsersUpdate,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
 ):
+    if not auth_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     user = await users_repo.get_user_by_id(user_id=user_id)
     if not user:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
@@ -85,24 +102,29 @@ async def update_user(
                    status.HTTP_200_OK: {"description": "User deleted"}
                })
 async def delete_user(
+    auth_user: user_dependency,
     user_id: int,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
 ):
+    if not auth_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     user = await users_repo.get_user_by_id(user_id=user_id)
     if not user:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
     await users_repo.delete_user(user_id=user_id)
     return JSONResponse(status_code=status.HTTP_200_OK, content={"detail": "User deleted"})
 
-files_router = APIRouter(prefix="/documents")
 
 @files_router.post("/extract", response_model=FilesExtractResponse, name="documents:extract-file",
                    status_code=status.HTTP_200_OK)
 async def upload_document(
+    auth_user: user_dependency,
     user_id: int,
     user_document_upload: FilesExtract,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository))
 ):
+    if not auth_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     # existing_user = await users_repo.get_user_by_id(user_document_upload.user_id)
     # if not existing_user:
     #     raise HTTPException(status_code=404, detail="User not found")
@@ -121,11 +143,14 @@ async def upload_document(
                 status.HTTP_200_OK: {"model": UsersPublic, "description": "File uploaded"}
                 })
 async def upload_document(
+    auth_user: user_dependency,
     user_id: int,
     uploaded_file: UploadFile,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
     files_repo: FilesRepository = Depends(get_repository(FilesRepository))
 ):
+    if not auth_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     existing_user = await users_repo.get_user_by_id(user_id=user_id)
     if not existing_user:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
@@ -148,10 +173,13 @@ async def upload_document(
                 status.HTTP_200_OK: {"model": list[FilesPublic], "description": "Files found"}
                 })
 async def get_files_by_user_id(
+    auth_user: user_dependency,
     user_id: int,
     users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
     files_repo: FilesRepository = Depends(get_repository(FilesRepository))
 ):
+    if not auth_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     existing_user = await users_repo.get_user_by_id(user_id=user_id)
     if not existing_user:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
@@ -165,9 +193,12 @@ async def get_files_by_user_id(
                 status.HTTP_200_OK: {"model": FilesPublic, "description": "File found"}
                 })
 async def get_file_by_id(
+    auth_user: user_dependency,
     file_id: int,
     files_repo: FilesRepository = Depends(get_repository(FilesRepository))
 ):
+    if not auth_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     existing_file = await files_repo.get_file_by_id(id=file_id)
     if not existing_file:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "File not found"})
@@ -181,9 +212,12 @@ async def get_file_by_id(
                    status.HTTP_200_OK: {"description": "File deleted"}
                })
 async def delete_file(
+    auth_user: user_dependency,
     file_id: int,
     files_repo: FilesRepository = Depends(get_repository(FilesRepository))
 ):
+    if not auth_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     existing_file = await files_repo.get_file_by_id(id=file_id)
     if not existing_file:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "User not found"})
@@ -191,5 +225,6 @@ async def delete_file(
     await files_repo.delete_file(id=file_id)
     return JSONResponse(status_code=status.HTTP_200_OK, content={"detail": "File deleted"})
 
-user_router.include_router(files_router)
-router.include_router(user_router)
+router.include_router(router=users_router)
+router.include_router(router=user_router)
+router.include_router(router=files_router)

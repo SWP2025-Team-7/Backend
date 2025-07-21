@@ -49,14 +49,24 @@ def create_files_table()->None:
         sa.Column("user_id", sa.Integer, sa.ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False),
         sa.Column("created_at", sa.DateTime, nullable=False),
     )
+    
+def create_admins_table()->None:
+    op.create_table(
+        "admins",
+        sa.Column("id", sa.Integer, primary_key=True),
+        sa.Column("username", sa.Text, nullable=False, unique=True),
+        sa.Column("hashed_password", sa.Text, nullable=False)
+    )
 
 def upgrade() -> None:
     create_users_table()
     create_files_table()
+    create_admins_table()
  
  
 def downgrade() -> None:
     op.drop_table("users")
     op.drop_table("files")
+    op.drop_table("admins")
  
  
